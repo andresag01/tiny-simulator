@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Tiny Simulator is a simple graphical simulator to help you understand how a modern processor works." />
+        <meta name="keywords" content="processor, simulator" />
+        <meta name="application-name" content="Tiny Simulator" />
+
+	    <meta property="og:title" content="Tiny Simulator" />
+	    <meta property="og:type" content="website" />
+	    <meta property="og:url" content="index.html" />
+
+        <title>Tiny Simulator</title>
+
+        <!-- fav icon -->
+        <link rel='shortcut icon' type='image/x-icon' href='images/favicon.ico'>
+        <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+
+        <!-- Bootstrap -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Include style sheet -->
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <!-- Include Ace for text editor -->
+        <script src="js/utils/ace-src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include proper regular expression handling library -->
+        <script src="js/utils/xregexp.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include Assembly syntax checker -->
+        <script src="js/utils/asm-syntax-checker.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include sliding menu script -->
+        <script src="js/utils/sliding-menu.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include spinner script for waiting -->
+        <script src="js/utils/sonic.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include asynchronous task -->
+        <script src="js/utils/async-task.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include simulator script -->
+        <script src="js/utils/simulator.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include jQuery for nice effects -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <!-- Include the javascript simulator -->
+        <script src="js/processor/processor.js"></script>
+        <!-- Include jQuery UI for draggables in popups -->
+        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <!-- Include the popup manager for displaying information -->
+        <script src="js/utils/popup-manager.js" type="text/javascript" charset="utf-8"></script>
+        <!-- Include jQuery UI stylesheets -->
+        <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <!--  Include Cytoscape for processor block diagram -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.1.1/cytoscape.min.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div id="o-wrapper" class="o-wrapper">
+            <div id="editor"></div>
+
+            <div id="rightPanel">
+                <div id="topComponent">
+                    <h1>Tiny Simulator</h1>
+                    <p>Tiny Simulator is a simple graphical simulator to help you understand how a modern processor works. Playing with the simulator, you will be able to trace how data moves accross the components of a processor pipeline and how instructions are executed.</p>
+                    <h2>Getting started in 3 steps</h2>
+                    <ol>
+                        <li>Write (or load) your program on the editor...<br/>
+                            <input type="file" id="programFile" name="files[]" /><br/>
+                            or select one of the samples!<br/>
+                            <select id="programSamples">
+                                <option value="asm/bubble-sort.s" selected>Bubble sort</option>
+                                <option value="asm/factorial.s">Factorial</option>
+                                <option value="asm/fibo.s">Fibonacci</option>
+                                <option value="asm/hamming-weight.s">Hamming weight</option>
+                                <option value="asm/inner-product.s">Inner product</option>
+                            </select>
+                        </li>
+                        <li>Make sure that there are no syntax errors<br/>
+                            <button type="button" onclick="assembleAndReport(editor, aceConsole)">Assemble code</button>
+                        </li>
+                        <li>Start the simulation!<br/>
+                            <button type="button" onclick="simulator.start(editor, aceConsole, '#o-wrapper', '#simulator-block-diagram')">Start simulation</button>
+                        </li>
+                    </ol>
+                    <p>For more information, check out the documentation.</p>
+                    <button id="c-button--slide-left" class="c-button">Documentation</button>
+                </div>
+                <div id="console">Press the 'Assemble' button to start analyzing your program. The output will be printed in this console.</div>
+            </div>
+        </div>
+
+        <div id="simulator-block-diagram">
+            <div id="processorShortInfoContainer">
+                <ul id='processorShortInfo'>
+                    <li class='processorShortInfoItems'>PC address: 0x<span id='pcAddr'></span></li>
+                    <li class='processorShortInfoItems'>Instruction at PC: <span id='instrAtPc'></span></li>
+                    <li class='processorShortInfoItems'>Cycle: <span id='cycleCnt'></span></li>
+                    <li class='processorShortInfoItems'>Halted: <span id='isHalted'></span></li>
+                </ul>
+            </div>
+            <div id="processorBlockDiagram">
+            </div>
+        </div>
+
+        <nav id="c-menu--slide-left" class="c-menu c-menu--slide-left">
+            <button class="c-menu__close">&larr; Close Menu</button>
+            <ul class="c-menu__items">
+                <li class="c-menu__item"><a href="/" class="c-menu__link">Home</a></li>
+                <li class="c-menu__item"><a href="#" class="c-menu__link">About</a></li>
+                <li class="c-menu__item"><a href="#" class="c-menu__link">Tiny instruction set</a></li>
+                <li class="c-menu__item"><a href="#" class="c-menu__link">Processor</a></li>
+                <li class="c-menu__item"><a href="#" class="c-menu__link"></a></li>
+            </ul>
+        </nav>
+
+        <nav id="c-menu--slide-bottom" class="c-menu c-menu--slide-bottom">
+            <ul class="c-menu__items">
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">Home</span></li>
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">All</span></li>
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">Next</span></li>
+                <li class="c-menu__item"><span class="c-menu__link">
+                    <span class="sim_interact">Next block</span>
+                    <input class="sim_next_block" type="number" min="1" max="10000" value="1" />
+                </li>
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">Memory</span></li>
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">Reset</span></li>
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">Summary</span></li>
+                <li class="c-menu__item"><span class="c-menu__link sim_interact">Help</span></li>
+                <li id="simulation-c-button--slide-left" class="c-menu__item"><span class="c-menu__link">Documentation</span></li>
+            </ul>
+        </nav>
+
+        <div id="overlay-mask" class="c-mask"></div>
+
+        <div id="spinner-overlay" class="overlay-hidden overlay">
+            <p><h3>Hang on, we are thinking!</h3></p>
+            <p><div id="spinner-overlay-animation"></div></p>
+            <p><button id="overlay-cancel">Cancel</button></p>
+        </div>
+
+        <script type="text/javascript">
+            // Configure the editor
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/assembly_x86");
+            editor.getSession().setTabSize(4);
+            editor.getSession().setUseSoftTabs(true);
+            editor.getSession().setUseWrapMode(true);
+            editor.setShowPrintMargin(false);
+            editor.$blockScrolling = Infinity
+
+            // Configure the console
+            var aceConsole = ace.edit("console");
+            aceConsole.getSession().setMode("ace/mode/plain_text");
+            aceConsole.getSession().setTabSize(4);
+            aceConsole.getSession().setUseSoftTabs(true);
+            aceConsole.getSession().setUseWrapMode(true);
+            aceConsole.setShowPrintMargin(false);
+            aceConsole.setReadOnly(true);
+            aceConsole.renderer.setOption('showLineNumbers', false);
+            aceConsole.setHighlightActiveLine(false);
+
+            // Load the first program after everything else has loaded
+            $(loadProgram($("#programSamples").val(), editor));
+
+            // Load a program onto the editor
+            function loadProgram(filename, editor) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        editor.setValue("");
+                        editor.session.insert({
+                                row: 0,
+                                col: 0
+                            },
+                            xhttp.responseText
+                        );
+                        editor.gotoLine(0, 0);
+                    }
+                };
+              xhttp.open("GET", filename, true);
+              xhttp.send();
+            };
+
+            // Change the editor contents when the dropdown list changes
+            $("#programSamples").change(function() {
+                loadProgram($("#programSamples").val(), editor);
+            });
+        </script>
+
+        <script type="text/javascript">
+            // File handling code
+            function handleFileSelect(evt) {
+                var files = evt.target.files; // FileList object
+
+                if (files.length > 1) {
+                    window.alert("Too many files supplied!");
+                } else if (files.length == 0) {
+                    window.alert("Not enough files supplied!");
+                }
+
+                var file = files[0];
+                var reader = new FileReader();
+
+                // Closure to capture the file information.
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        // Include the file in the editor
+                        editor.setValue("");
+                        editor.session.insert({
+                                row: 0,
+                                col: 0
+                            },
+                            e.target.result
+                        );
+                        editor.gotoLine(0, 0);
+                    };
+                })(file);
+                reader.readAsText(file);
+            }
+
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                // All the File APIs are supported. Include the file upload html elements
+                document.getElementById('programFile').addEventListener(
+                    'change', handleFileSelect, false);
+            } else {
+                $("#files").remove();
+                alert("The File APIs are not fully supported in this " +
+                    "browser. You will not be able to automatically read " +
+                    "files into the application.");
+            }
+        </script>
+
+        <script type="text/javascript">
+            // Bottom menu
+            var slideBottom = new Menu({
+                wrapper: '#simulator-block-diagram',
+                type: 'slide-bottom',
+                menuOpenerClass: '.c-button',
+                maskId: '#overlay-mask'
+            });
+
+            // Left menu
+            var slideLeft = new Menu({
+                wrapper: '#simulator-block-diagram',
+                type: 'slide-left',
+                menuOpenerClass: '.c-button',
+                maskId: '#overlay-mask'
+            });
+            var slideLeftBtn = document.querySelector('#c-button--slide-left');
+            slideLeftBtn.addEventListener('click', function(e) {
+                e.preventDefault;
+                slideBottom.closeBottomMenu();
+                slideLeft.open();
+            });
+        </script>
+
+        <script type="text/javascript">
+            function checkBrowser() {
+                var isOpera = (!!window.opr && !!opr.addons) || !!window.opera
+                    || navigator.userAgent.indexOf(' OPR/') >= 0;
+                    // Firefox 1.0+
+                var isFirefox = typeof InstallTrigger !== 'undefined';
+                    // At least Safari 3+: "[object HTMLElementConstructor]"
+                var isSafari = Object.prototype.toString.call(
+                    window.HTMLElement).indexOf('Constructor') > 0;
+                    // Internet Explorer 6-11
+                var isIE = /*@cc_on!@*/false || !!document.documentMode;
+                    // Edge 20+
+                var isEdge = !isIE && !!window.StyleMedia;
+                    // Chrome 1+
+                var isChrome = !!window.chrome && !!window.chrome.webstore;
+                    // Blink engine detection
+                var isBlink = (isChrome || isOpera) && !!window.CSS;
+
+                // Warn if we are running something that I havent tried
+                if (isOpera || isIE || isEdge || isSafari) {
+                    alert("I have no idea if I can run in your browser. " +
+                        "I have been tried in Chrome and Firefox only!\n\n" +
+                        "P.S. My maker refuses to go through all the browser " +
+                        "compatibility nonsense! ;)");
+                }
+            };
+            checkBrowser();
+        </script>
+
+        <script type="text/javascript">
+            var simulator = new Simulator();
+        </script>
+
+        <script type="text/javascript">
+            var spinnerHiddenOverlay = document.getElementById("spinner-overlay-animation");
+            var spinner =  new Sonic({
+                width: 100,
+                height: 100,
+
+                stepsPerFrame: 6,    // best between 1 and 5
+                trailLength: 0.9,    // between 0 and 1
+                pointDistance: 0.01, // best between 0.01 and 0.05
+                fps: 20,
+
+                backgroundColor: '#FFFFFF',
+                fillColor: '#66D9EF',
+
+                path: [
+                    ['arc', 50, 50, 30, 0, 360]
+                ],
+
+                step: function(point, index, frame) {
+                    // Here you can do custom stuff.
+                    // `this._` is a HTML 2d Canvas Context
+
+                    var sizeMultiplier = 7; // try changing this :)
+
+                    this._.beginPath();
+                    this._.moveTo(point.x, point.y);
+                    this._.arc(
+                        point.x, point.y,
+                        index * sizeMultiplier, 0,
+                        Math.PI*2, false
+                    );
+                    this._.closePath();
+                    this._.fill();
+                }
+            });
+            spinnerHiddenOverlay.appendChild(spinner.canvas);
+        </script>
+    </body>
+</html>
