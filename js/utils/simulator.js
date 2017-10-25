@@ -100,7 +100,7 @@ Simulator.prototype.start = function(editor, aceConsole, containerToClear, conta
 
     if (results.errors.length > 0) {
         window.alert("Assembly process failed. Please fix your program " +
-            "before you can proceed to simulation!");
+                     "before you can proceed to simulation!");
     } else if (results.instruction < 1) {
         window.alert("There are no instructions to execute!");
     } else {
@@ -943,33 +943,62 @@ Simulator.prototype.summaryHtmlGenerator = function() {
                 "</table>";
 
     // Fill in the branch statistics section
-    body += "<h3>Branch statistics</h3><table><tbody>";
-    body += "<tr><td>Total number of correct predictions</td><td>" +
-        passBPredictions + "</td></tr>";
-    body += "<tr><td>Total number of miss predictions</td><td>" +
-        failBPredictions + "</td></tr>";
-    body += "<tr><td>Total number of predictions</td><td>" + totBPredictions +
-        "</td></tr>";
-    body += "<tr><td>Total number of branches</td><td>" + totBExecuted +
-        "</td> </tr>";
-    body += "</tbody></table>";
+    body += "<h3>Branch statistics</h3>"                                +
+            "<table>"                                                   +
+            "   <tbody>"                                                +
+            "       <tr>"                                               +
+            "           <td>Total number of correct predictions</td>"   +
+            "           <td>" + passBPredictions + "</td>"              +
+            "       </tr>"                                              +
+            "       <tr>"                                               +
+            "           <td>Total number of miss predictions</td>"      +
+            "           <td>" + failBPredictions + "</td>"              +
+            "       </tr>"                                              +
+            "       <tr>"                                               +
+            "           <td>Total number of predictions</td>"           +
+            "           <td>" + totBPredictions + "</td>"               +
+            "       </tr>"                                              +
+            "       <tr>"                                               +
+            "           <td>Total number of branches</td>"              +
+            "           <td>" + totBExecuted + "</td>"                  +
+            "       </tr>"                                              +
+            "   </tbody>"                                               +
+            "</table>";
 
     // Fill in the register data section
-    body += "<h3>Register values</h3><table><thead><tr><th>Register Name</th>";
-    body += "<th>Value (hex)</th><th>Value (decimal)</th></tr></thead><tbody>";
+    body += "<h3>Register values</h3>"              +
+            "<table>"                               +
+            "   <thead>"                            +
+            "       <tr>"                           +
+            "           <th>Register Name</th>"     +
+            "           <th>Value (hex)</th>"       +
+            "           <th>Value (decimal)</th>"   +
+            "       </tr>"                          +
+            "   </thead>"                           +
+            "   <tbody>";
     for (var i = 0; i < Processor.TOT_REGISTERS; i++) {
         var regVal = (i == this.processor.regs.getPCIndex()) ?
             this.processor.regs.getPC() : this.processor.regs.get(i);
-        body += "<tr> <td>$" + i + "</td> <td>0x" +
-            Number(regVal).toHexString(8) + "</td><td>" + regVal +
-            "</td></tr>";
+        body += "<tr>"                                                  +
+                "   <td>$" + i + "</td>"                                +
+                "   <td>0x" + Number(regVal).toHexString(8) + "</td>"   +
+                "   <td>" + regVal + "</td>"                            +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     // Fill in the instruction statistics section
-    body += "<h3>Instruction statistics</h3><table><thead><tr>";
-    body += "<th>Instruction</th><th>Executed</th><th>Percentage</th>";
-    body += "</tr></thead><tbody>";
+    body += "<h3>Instruction statistics</h3>"       +
+            "<table>"                               +
+            "   <thead>"                            +
+            "       <tr>"                           +
+            "           <th>Instruction</th>"       +
+            "           <th>Executed</th>"          +
+            "           <th>Percentage</th>"        +
+            "       </tr>"                          +
+            "   </thead>"                           +
+            "   <tbody>";
     for (var instr in instrLog) {
         // Aparently JS will iterate through the function members as well!
         if (!Number.isInteger(instrLog[instr])) {
@@ -977,10 +1006,14 @@ Simulator.prototype.summaryHtmlGenerator = function() {
         }
         var instrPercentage = instrLog.instructionPercentage(instr, instrCnt);
         instrPercentage     = isNaN(instrPercentage) ? "-" : instrPercentage;
-        body += "<tr><td>" + instr + "</td><td>" + instrLog[instr] +
-            "</td><td>%" + instrPercentage + "</td></tr>";
+        body += "<tr>"                                  +
+                "   <td>" + instr + "</td>"             +
+                "   <td>" + instrLog[instr] + "</td>"   +
+                "   <td>%" + instrPercentage + "</td>"  +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Simulation summary",
@@ -1028,32 +1061,23 @@ Simulator.prototype.memoryHtmlGenerator = function() {
             data = memory[addr].code;
         }
         pcPointer = (addr == pcAddr) ? '&rarr;' : '';
-        body += '<tr>'                                                   +
-                '   <td>'                                                +
-                pcPointer                                                +
-                '   </td>'                                               +
-                '   <td>'                                                +
-                '       <input type="checkbox" value="false"'            +
-                '           name="' + addr + '"' + checkBoxValue + ' />' +
-                '   </td>'                                               +
-                '   <td>'                                                +
-                '       0x' + Number(addr).toHexString(8)                +
-                '   </td>'                                               +
-                '   <td>'                                                +
-                        data                                             +
-                '   </td>';
+        body += '<tr>'                                                                                          +
+                '   <td>' + pcPointer + '</td>'                                                                 +
+                '   <td><input type="checkbox" value="false" name="' + addr + '"' + checkBoxValue + ' /></td>'  +
+                '   <td>0x' + Number(addr).toHexString(8) + '</td>'                                             +
+                '   <td>' + data + '   </td>';
         if (typeof addrToLabel[addr] === 'undefined') {
-            body += '<td></td>';
+            body += '   <td></td>';
         } else {
-            body += '<td>' + addrToLabel[addr].join(", ") + '</td>';
+            body += '   <td>' + addrToLabel[addr].join(", ") + '</td>';
         }
         body += '</tr>';
     }
-    body     += "</tbody></table>";
+    body += '   </tbody>'   +
+            '</table>';
 
     // Add a button to update the breakpoints
-    body     += '<button type="button" onclick="simulator.saveBreakpoints()">';
-    body     += 'Apply</button>';
+    body += '<button type="button" onclick="simulator.saveBreakpoints()">Apply</button>';
 
     return {
         title: "Memory contents and breakpoints",
@@ -1094,17 +1118,27 @@ Simulator.prototype.closeBlockingOverlay = function(overlayId) {
 };
 
 Simulator.prototype.regsHtmlGenerator = function() {
-    var body = "<h3>Register values</h3>";
-    body += "<table><thead><tr><th>Register Name</th>";
-    body += "<th>Value (hex)</th><th>Value (decimal)</th></tr></thead><tbody>";
+    var body = "<h3>Register values</h3>"               +
+               "<table>"                                +
+               "    <thead>"                            +
+               "        <tr>"                           +
+               "            <th>Register Name</th>"     +
+               "            <th>Value (hex)</th>"       +
+               "            <th>Value (decimal)</th>"   +
+               "        </tr>"                          +
+               "    </thead>"                           +
+               "    <tbody>";
     for (var i = 0; i < Processor.TOT_REGISTERS; i++) {
         var regVal = (i == this.processor.regs.getPCIndex()) ?
             this.processor.regs.getPC() : this.processor.regs.get(i);
-        body += "<tr> <td>$" + i + "</td> <td>0x" +
-            Number(regVal).toHexString(8) + "</td><td>" + regVal +
-            "</td></tr>";
+        body += "<tr>"                                                  +
+                "   <td>$" + i + "</td>"                                +
+                "   <td>0x" + Number(regVal).toHexString(8) + "</td>"   +
+                "   <td>" + regVal + "</td>"                            +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Register file",
@@ -1113,13 +1147,21 @@ Simulator.prototype.regsHtmlGenerator = function() {
 };
 
 Simulator.prototype.rntHtmlGenerator = function() {
-    var body = "<h3>Rename table values</h3>";
-    body += "<table><thead><tr><th>Register</th><th>Names</th></tr></head>";
-    body += "<tbody>";
+    var body = "<h3>Rename table values</h3>"           +
+               "<table>"                                +
+               "    <thead>"                            +
+               "        <tr>"                           +
+               "            <th>Register</th>"          +
+               "            <th>Names</th>"             +
+               "        </tr>"                          +
+               "    </thead>"                           +
+               "    <tbody>";
     for (var i in this.processor.rnt.table) {
         var regVal = (i == this.processor.regs.getPCIndex()) ?
             "PC" : Number(i).toString();
-        body += "<tr><td>$" + regVal + "</td> <td>";
+        body += "<tr>"                          +
+                "   <td>$" + regVal + "</td>"   +
+                "   <td>";
         if (this.processor.rnt.table[i].length == 0) {
             body += "-";
         } else {
@@ -1128,9 +1170,11 @@ Simulator.prototype.rntHtmlGenerator = function() {
                 body += this.processor.rnt.table[i][j];
             }
         }
-        body += "</td></tr>";
+        body += "   </td>"  +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Rename table",
@@ -1139,11 +1183,19 @@ Simulator.prototype.rntHtmlGenerator = function() {
 };
 
 Simulator.prototype.robHtmlGenerator = function() {
-    var body = "<h3>Reorder Buffer Values</h3>";
-    body += "<table><thead><tr><th>Reorder Buffer Tag</th>";
-    body += "<th>Reservation Station Tag</th><th>Operation</th>";
-    body += "<th>Result Register</th><th>Ready</th><th>Result</th>";
-    body += "</tr></thead><body>";
+    var body = "<h3>Reorder Buffer Values</h3>"                 +
+               "<table>"                                        +
+               "    <thead>"                                    +
+               "        <tr>"                                   +
+               "            <th>Reorder Buffer Tag</th>"        +
+               "            <th>Reservation Station Tag</th>"   +
+               "            <th>Operation</th>"                 +
+               "            <th>Result Register</th>"           +
+               "            <th>Ready</th>"                     +
+               "            <th>Result</th>"                    +
+               "        </tr>"                                  +
+               "    </thead>"                                   +
+               "    <body>";
     for (var i = this.processor.rob.first;
         i != this.processor.rob.last;
         i = (i + 1) % this.processor.rob.buff.length) {
@@ -1155,16 +1207,17 @@ Simulator.prototype.robHtmlGenerator = function() {
         ready     = this.processor.rob.buff[i].ready;
         resVal    = Number(this.processor.rob.buff[i].resVal).toString();
 
-        body += "<tr>";
-        body += "<td>" + robTag    + "</td>";
-        body += "<td>" + rsTag     + "</td>";
-        body += "<td>" + operation + "</td>";
-        body += "<td>" + resReg    + "</td>";
-        body += "<td>" + ready     + "</td>";
-        body += "<td>" + resVal    + "</td>";
-        body += "</tr>";
+        body += "<tr>"                          +
+                "   <td>" + robTag + "</td>"    +
+                "   <td>" + rsTag + "</td>"     +
+                "   <td>" + operation + "</td>" +
+                "   <td>" + resReg + "</td>"    +
+                "   <td>" + ready + "</td>"     +
+                "   <td>" + resVal + "</td>"    +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Reorder buffer",
@@ -1188,10 +1241,21 @@ Simulator.prototype.processRsRecord = function(record) {
 };
 
 Simulator.prototype.execRsHtmlGenerator = function() {
-    var body = "<h3>Arithmetic and Logic Reservation Station Values</h3>";
-    body += "<table><thead><tr><th>Reservation Station Tag</th>";
-    body += "<th>Operation</th><th>rsj</th><th>rsk</th><th>vj</th><th>vk</th>";
-    body += "<th>Reorder Buffer Tag</th><th>In Use?</th></tr></thead><tbody>";
+    var body = "<h3>Arithmetic and Logic Reservation Station Values</h3>"   +
+               "<table>"                                                    +
+               "    <thead>"                                                +
+               "        <tr>"                                               +
+               "            <th>Reservation Station Tag</th>"               +
+               "            <th>Operation</th>"                             +
+               "            <th>rsj</th>"                                   +
+               "            <th>rsk</th>"                                   +
+               "            <th>vj</th>"                                    +
+               "            <th>vk</th>"                                    +
+               "            <th>Reorder Buffer Tag</th>"                    +
+               "            <th>In Use?</th>"                               +
+               "        </tr>"                                              +
+               "    </thead>"                                               +
+               "    <tbody>";
     for (var i in this.processor.execRs.records) {
         if (this.processor.execRs.records[i] == null) {
             continue;
@@ -1200,18 +1264,19 @@ Simulator.prototype.execRsHtmlGenerator = function() {
         var recordStrs =
             this.processRsRecord(this.processor.execRs.records[i]);
 
-        body += "<tr>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.operation + "</td>";
-        body += "<td>" + recordStrs.rsj       + "</td>";
-        body += "<td>" + recordStrs.rsk       + "</td>";
-        body += "<td>" + recordStrs.vj        + "</td>";
-        body += "<td>" + recordStrs.vk        + "</td>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.inUse     + "</td>";
-        body += "</tr>";
+        body += "<tr>"                                      +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.operation + "</td>"  +
+                "   <td>" + recordStrs.rsj + "</td>"        +
+                "   <td>" + recordStrs.rsk + "</td>"        +
+                "   <td>" + recordStrs.vj + "</td>"         +
+                "   <td>" + recordStrs.vk + "</td>"         +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.inUse + "</td>"      +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Arithmetic and logic reservation station",
@@ -1220,10 +1285,20 @@ Simulator.prototype.execRsHtmlGenerator = function() {
 };
 
 Simulator.prototype.loadStoreRsHtmlGenerator = function() {
-    var body = "<h3>Load Reservation Station Values</h3>";
-    body += "<table><thead><tr><th>Reservation Station Tag</th>";
-    body += "<th>Operation</th><th>rsj</th><th>vj</th><th>Address</th>";
-    body += "<th>Reorder Buffer Tag</th><th>In Use?</th></tr></thead><tbody>";
+    var body = "<h3>Load Reservation Station Values</h3>"       +
+               "<table>"                                        +
+               "    <thead>"                                    +
+               "        <tr>"                                   +
+               "            <th>Reservation Station Tag</th>"   +
+               "            <th>Operation</th>"                 +
+               "            <th>rsj</th>"                       +
+               "            <th>vj</th>"                        +
+               "            <th>Address</th>"                   +
+               "            <th>Reorder Buffer Tag</th>"        +
+               "            <th>In Use?</th>"                   +
+               "        </tr>"                                  +
+               "    </thead>"                                   +
+               "    <tbody>";
     for (var i in this.processor.loadRs.records) {
         if (this.processor.loadRs.records[i] == null) {
             continue;
@@ -1232,23 +1307,35 @@ Simulator.prototype.loadStoreRsHtmlGenerator = function() {
         var recordStrs =
             this.processRsRecord(this.processor.loadRs.records[i]);
 
-        body += "<tr>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.operation + "</td>";
-        body += "<td>" + recordStrs.rsj       + "</td>";
-        body += "<td>" + recordStrs.vj        + "</td>";
-        body += "<td>" + recordStrs.addr      + "</td>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.inUse     + "</td>";
-        body += "</tr>";
+        body += "<tr>"                                      +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.operation + "</td>"  +
+                "   <td>" + recordStrs.rsj + "</td>"        +
+                "   <td>" + recordStrs.vj + "</td>"         +
+                "   <td>" + recordStrs.addr + "</td>"       +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.inUse + "</td>"      +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
-    body += "<h3>Store Reservation Station Values</h3>";
-    body += "<table><thead><tr><th>Reservation Station Tag</th>";
-    body += "<th>Operation</th><th>rsj</th><th>rsk</th><th>vj</th>";
-    body += "<th>vk</th><th>Address</th>";
-    body += "<th>Reorder Buffer Tag</th><th>In Use?</th></tr></thead><tbody>";
+    body += "<h3>Store Reservation Station Values</h3>"     +
+            "<table>"                                       +
+            "   <thead>"                                    +
+            "       <tr>"                                   +
+            "           <th>Reservation Station Tag</th>"   +
+            "           <th>Operation</th>"                 +
+            "           <th>rsj</th>"                       +
+            "           <th>rsk</th>"                       +
+            "           <th>vj</th>"                        +
+            "           <th>vk</th>"                        +
+            "           <th>Address</th>"                   +
+            "           <th>Reorder Buffer Tag</th>"        +
+            "           <th>In Use?</th>"                   +
+            "       </tr>"                                  +
+            "   </thead>"                                   +
+            "   <tbody>";
     for (var i in this.processor.storeRs.records) {
         if (this.processor.storeRs.records[i] == null) {
             continue;
@@ -1257,19 +1344,20 @@ Simulator.prototype.loadStoreRsHtmlGenerator = function() {
         var recordStrs =
             this.processRsRecord(this.processor.storeRs.records[i]);
 
-        body += "<tr>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.operation + "</td>";
-        body += "<td>" + recordStrs.rsj       + "</td>";
-        body += "<td>" + recordStrs.rsk       + "</td>";
-        body += "<td>" + recordStrs.vj        + "</td>";
-        body += "<td>" + recordStrs.vk        + "</td>";
-        body += "<td>" + recordStrs.addr      + "</td>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.inUse     + "</td>";
-        body += "</tr>";
+        body += "<tr>"                                      +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.operation + "</td>"  +
+                "   <td>" + recordStrs.rsj + "</td>"        +
+                "   <td>" + recordStrs.rsk + "</td>"        +
+                "   <td>" + recordStrs.vj + "</td>"         +
+                "   <td>" + recordStrs.vk + "</td>"         +
+                "   <td>" + recordStrs.addr + "</td>"       +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.inUse + "</td>"      +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Load/Store reservation station",
@@ -1278,11 +1366,23 @@ Simulator.prototype.loadStoreRsHtmlGenerator = function() {
 };
 
 Simulator.prototype.branchRsHtmlGenerator = function() {
-    var body = "<h3>Branch Reservation Station Values</h3>";
-    body += "<table><thead><tr><th>Reservation Station Tag</th>";
-    body += "<th>Operation</th><th>rsj</th><th>rsk</th><th>vj</th>";
-    body += "<th>vk</th><th>Target address</th><th>Instruction address</th>";
-    body += "<th>Reorder Buffer Tag</th><th>In Use?</th></tr></thead><tbody>";
+    var body = "<h3>Branch Reservation Station Values</h3>"     +
+               "<table>"                                        +
+               "    <thead>"                                    +
+               "        <tr>"                                   +
+               "            <th>Reservation Station Tag</th>"   +
+               "            <th>Operation</th>"                 +
+               "            <th>rsj</th>"                       +
+               "            <th>rsk</th>"                       +
+               "            <th>vj</th>"                        +
+               "            <th>vk</th>"                        +
+               "            <th>Target address</th>"            +
+               "            <th>Instruction address</th>"       +
+               "            <th>Reorder Buffer Tag</th>"        +
+               "            <th>In Use?</th>"                   +
+               "        </tr>"                                  +
+               "    </thead>"                                   +
+               "    <tbody>";
     for (var i in this.processor.branchRs.records) {
         if (this.processor.branchRs.records[i] == null) {
             continue;
@@ -1291,20 +1391,21 @@ Simulator.prototype.branchRsHtmlGenerator = function() {
         var recordStrs =
             this.processRsRecord(this.processor.branchRs.records[i]);
 
-        body += "<tr>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.operation + "</td>";
-        body += "<td>" + recordStrs.rsj       + "</td>";
-        body += "<td>" + recordStrs.rsk       + "</td>";
-        body += "<td>" + recordStrs.vj        + "</td>";
-        body += "<td>" + recordStrs.vk        + "</td>";
-        body += "<td>" + recordStrs.addr      + "</td>";
-        body += "<td>" + recordStrs.pcSrcAddr + "</td>";
-        body += "<td>" + recordStrs.rsTag     + "</td>";
-        body += "<td>" + recordStrs.inUse     + "</td>";
-        body += "</tr>";
+        body += "<tr>"                                      +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.operation + "</td>"  +
+                "   <td>" + recordStrs.rsj + "</td>"        +
+                "   <td>" + recordStrs.rsk + "</td>"        +
+                "   <td>" + recordStrs.vj + "</td>"         +
+                "   <td>" + recordStrs.vk + "</td>"         +
+                "   <td>" + recordStrs.addr + "</td>"       +
+                "   <td>" + recordStrs.pcSrcAddr + "</td>"  +
+                "   <td>" + recordStrs.rsTag + "</td>"      +
+                "   <td>" + recordStrs.inUse + "</td>"      +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Branch reservation station",
@@ -1313,20 +1414,27 @@ Simulator.prototype.branchRsHtmlGenerator = function() {
 };
 
 Simulator.prototype.instrBuffHtmlGenerator = function() {
-    var body = "<h3>Instruction Buffer Contents</h3>";
-    body += "<table><thead><tr><th>Address</th><th>Instruction</th>"
-    body += "</tr></thead><tbody>";
+    var body = "<h3>Instruction Buffer Contents</h3>"   +
+               "<table>"                                +
+               "    <thead>"                            +
+               "        <tr>"                           +
+               "            <th>Address</th>"           +
+               "            <th>Instruction</th>"       +
+               "        </tr>"                          +
+               "    </thead>"                           +
+               "    <tbody>";
     for (var i in this.processor.instrBuff) {
         if (this.processor.instrBuff[i] == null) {
             continue;
         } else if ("code" in this.processor.instrBuff[i].data) {
-            body += "<tr>";
-            body += "<td>" + this.processor.instrBuff[i].addr      + "</td>";
-            body += "<td>" + this.processor.instrBuff[i].data.code + "</td>";
-            body += "</tr>";
+            body += "<tr>"                                                      +
+                    "   <td>" + this.processor.instrBuff[i].addr + "</td>"      +
+                    "   <td>" + this.processor.instrBuff[i].data.code + "</td>" +
+                    "</tr>";
         }
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Instruction buffer",
@@ -1335,22 +1443,29 @@ Simulator.prototype.instrBuffHtmlGenerator = function() {
 };
 
 Simulator.prototype.cdbHtmlGenerator = function() {
-    var body = "<h3>Common Data Bus Contents</h3>";
-    body += "<table><thead><tr><th>Reorder Buffer Tag</th>";
-    body += "<th>Reservation Station Tag</th><th>Result</th></tr>";
-    body += "</thead><tbody>";
+    var body = "<h3>Common Data Bus Contents</h3>"              +
+               "<table>"                                        +
+               "    <thead>"                                    +
+               "        <tr>"                                   +
+               "            <th>Reorder Buffer Tag</th>"        +
+               "            <th>Reservation Station Tag</th>"   +
+               "            <th>Result</th>"                    +
+               "        </tr>"                                  +
+               "    </thead>"                                   +
+               "    <tbody>";
     for (var i in this.processor.cdb.buff) {
         if (this.processor.cdb.buff[i] == null) {
             continue;
         }
 
-        body += "<tr>";
-        body += "<td>" + this.processor.cdb.buff[i].robTag + "</td>";
-        body += "<td>" + this.processor.cdb.buff[i].rsTag  + "</td>";
-        body += "<td>" + this.processor.cdb.buff[i].resVal + "</td>";
-        body += "</tr>";
+        body += "<tr>"                                                      +
+                "   <td>" + this.processor.cdb.buff[i].robTag + "</td>"     +
+                "   <td>" + this.processor.cdb.buff[i].rsTag  + "</td>"     +
+                "   <td>" + this.processor.cdb.buff[i].resVal + "</td>"     +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Common data bus",
@@ -1359,26 +1474,34 @@ Simulator.prototype.cdbHtmlGenerator = function() {
 };
 
 Simulator.prototype.execUnitsHtmlGenerator = function() {
-    var body = "<h3>Execution Units Summary</h3>";
-    body += "<table><theader><tr><td>Unit</td><td>Status</td>";
-    body += "<td>Reservation station tag in use</td><td>";
-    body += "Cycles to completion</td></tr></theader><tbody>";
+    var body = "<h3>Execution Units Summary</h3>"                       +
+               "<table>"                                                +
+               "    <theader>"                                          +
+               "        <tr>"                                           +
+               "            <td>Unit</td>"                              +
+               "            <td>Status</td>"                            +
+               "            <td>Reservation station tag in use</td>"    +
+               "            <td>Cycles to completion</td>"              +
+               "        </tr>"                                          +
+               "    </theader>"                                         +
+               "    <tbody>";
 
     for (var i = 0; i < Processor.TOT_EXEC; ++i) {
-        body += "<tr>";
-        body += "<td>" + i + "</td>";
+        body += "<tr>"                  +
+                "   <td>" + i + "</td>";
         if (this.processor.exec.localRs == null) {
-            body += "<td>Idle</td>";
-            body += "<td>" + "-" + "</td>";
-            body += "<td>" + "-" + "</td>";
+            body += "<td>Idle</td>"         +
+                    "<td>" + "-" + "</td>"  +
+                    "<td>" + "-" + "</td>";
         } else {
-            body += "<td>Busy</td>";
-            body += "<td>" + this.processor.exec.localRs.rsTag + "</td>";
-            body += "<td>" + this.processor.exec.remainingCycles + "</td>";
+            body += "<td>Busy</td>"                                         +
+                    "<td>" + this.processor.exec.localRs.rsTag + "</td>"    +
+                    "<td>" + this.processor.exec.remainingCycles + "</td>";
         }
         body += "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Arithmetic and logic execution units",
@@ -1387,26 +1510,34 @@ Simulator.prototype.execUnitsHtmlGenerator = function() {
 };
 
 Simulator.prototype.memUnitsHtmlGenerator = function() {
-    var body = "<h3>Memory Access Units Summary</h3>";
-    body += "<table><theader><tr><td>Unit</td><td>Status</td>";
-    body += "<td>Reservation station tag in use</td><td>";
-    body += "Cycles to completion</td></tr></theader><tbody>";
+    var body = "<h3>Memory Access Units Summary</h3>"                   +
+               "<table>"                                                +
+               "    <theader>"                                          +
+               "        <tr>"                                           +
+               "            <td>Unit</td>"                              +
+               "            <td>Status</td>"                            +
+               "            <td>Reservation station tag in use</td>"    +
+               "            <td>Cycles to completion</td>"              +
+               "        </tr>"                                          +
+               "    </theader>"                                         +
+               "    <tbody>";
 
     for (var i = 0; i < Processor.TOT_MEM; ++i) {
-        body += "<tr>";
-        body += "<td>" + i + "</td>";
+        body += "<tr>"                  +
+                "   <td>" + i + "</td>";
         if (this.processor.memAccess.localRs == null) {
-            body += "<td>Idle</td>";
-            body += "<td>" + "-" + "</td>";
-            body += "<td>" + "-" + "</td>";
+            body += "<td>Idle</td>"         +
+                    "<td>" + "-" + "</td>"  +
+                    "<td>" + "-" + "</td>";
         } else {
-            body += "<td>Busy</td>";
-            body += "<td>" + this.processor.memAccess.localRs.rsTag + "</td>";
-            body += "<td>" + this.processor.memAccess.remainingCycles + "</td>";
+            body += "<td>Busy</td>"                                             +
+                    "<td>" + this.processor.memAccess.localRs.rsTag + "</td>"   +
+                    "<td>" + this.processor.memAccess.remainingCycles + "</td>";
         }
         body += "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Memory access execution units",
@@ -1430,17 +1561,18 @@ Simulator.prototype.branchPredictorHtmlGenerator = function() {
         if (!this.processor.branchPredictor.bCounterTable[i].isSet()) {
             continue;
         }
-        body += "<tr>";
-        body += "<td>" + i + "</td>";
+        body += "<tr>"                  +
+                "   <td>" + i + "</td>";
         if (this.processor.branchPredictor.bCounterTable[i].takeBranch()) {
             body += "<td>Yes</td>";
         } else {
             body += "<td>No</td>";
         }
-        body += "<td>" + this.processor.branchPredictor.BTACache[i] + "</td>";
-        body += "</tr>";
+        body += "   <td>" + this.processor.branchPredictor.BTACache[i] + "</td>"    +
+                "</tr>";
     }
-    body += "</tbody></table>";
+    body += "   </tbody>"   +
+            "</table>";
 
     return {
         title: "Commit unit (and branch predictor)",
@@ -1448,6 +1580,7 @@ Simulator.prototype.branchPredictorHtmlGenerator = function() {
     };
 };
 
+/* Print an integer in hex format */
 Number.prototype.toHexString = function(size) {
     var hexStr = this.toString(16);
     while (hexStr.length < size) {
