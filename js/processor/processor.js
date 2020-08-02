@@ -2542,8 +2542,8 @@ OperationsDuration = {
     JR    : 1,
     BBR   : 1,
     BBO   : 1,
-    SW    : 1,
-    LW    : 1,
+    SW    : 3,
+    LW    : 3,
     LC    : 1,
     MV    : 1,
     HALT  : 1

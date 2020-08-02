@@ -267,7 +267,7 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
                 locked: true,
                 grabbable: false,
                 selected: false,
-                selectable: false,
+                selectable: true,
             },
             {
                 data: {
@@ -291,7 +291,7 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
                 locked: true,
                 grabbable: false,
                 selected: false,
-                selectable: false,
+                selectable: true,
             },
             {
                 data: {
@@ -303,7 +303,7 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
                 locked: true,
                 grabbable: false,
                 selected: false,
-                selectable: false,
+                selectable: true,
             },
             {
                 data: {
@@ -315,7 +315,7 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
                 locked: true,
                 grabbable: false,
                 selected: false,
-                selectable: false,
+                selectable: true,
             },
             {
                 data: {
@@ -736,9 +736,13 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
             case "commonDataBus":
                 self.createPopup(self.popups.cdb);
                 break;
+            case "executionUnit0":
+            case "executionUnit1":
+            case "executionUnit2":
             case "executionUnit3":
                 self.createPopup(self.popups.execUnits);
                 break;
+            case "memoryUnit0":
             case "memoryUnit1":
                 self.createPopup(self.popups.memUnits);
                 break;
@@ -746,7 +750,7 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
                 self.createPopup(self.popups.branchPredictor);
                 break;
             default:
-                console.log(evt.target.id() + " does not have internal state");
+                console.log(evt.target.id() + " DOES not have internal state");
         }
     });
 };
@@ -1489,14 +1493,14 @@ Simulator.prototype.execUnitsHtmlGenerator = function() {
     for (var i = 0; i < Processor.TOT_EXEC; ++i) {
         body += "<tr>"                  +
                 "   <td>" + i + "</td>";
-        if (this.processor.exec.localRs == null) {
+        if (this.processor.exec[i].localRs == null) {
             body += "<td>Idle</td>"         +
                     "<td>" + "-" + "</td>"  +
                     "<td>" + "-" + "</td>";
         } else {
             body += "<td>Busy</td>"                                         +
-                    "<td>" + this.processor.exec.localRs.rsTag + "</td>"    +
-                    "<td>" + this.processor.exec.remainingCycles + "</td>";
+                    "<td>" + this.processor.exec[i].localRs.rsTag + "</td>" +
+                    "<td>" + this.processor.exec[i].remainingCycles + "</td>";
         }
         body += "</tr>";
     }
@@ -1525,14 +1529,14 @@ Simulator.prototype.memUnitsHtmlGenerator = function() {
     for (var i = 0; i < Processor.TOT_MEM; ++i) {
         body += "<tr>"                  +
                 "   <td>" + i + "</td>";
-        if (this.processor.memAccess.localRs == null) {
+        if (this.processor.memAccess[i].localRs == null) {
             body += "<td>Idle</td>"         +
                     "<td>" + "-" + "</td>"  +
                     "<td>" + "-" + "</td>";
         } else {
             body += "<td>Busy</td>"                                             +
-                    "<td>" + this.processor.memAccess.localRs.rsTag + "</td>"   +
-                    "<td>" + this.processor.memAccess.remainingCycles + "</td>";
+                    "<td>" + this.processor.memAccess[i].localRs.rsTag + "</td>" +
+                    "<td>" + this.processor.memAccess[i].remainingCycles + "</td>";
         }
         body += "</tr>";
     }
