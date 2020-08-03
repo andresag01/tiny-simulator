@@ -233,7 +233,7 @@ Commit.prototype.next = function() {
             case "ANDI":
             case "ORI":
             case "SLL":
-            case "SLR":
+            case "SRL":
             case "LW": {
                 // All arithmetic instructions have a result operand,
                 // so we need to write that value back to the register file
@@ -465,7 +465,7 @@ Writeback.prototype.next = function() {
             case "ANDI":
             case "ORI":
             case "SLL":
-            case "SLR": {
+            case "SRL": {
                 this.processor.execRs.clearRecord(result.rsTag);
                 break;
             }
@@ -1086,7 +1086,7 @@ IssueDecode.prototype.next = function() {
             case "ANDI":
             case "ORI":
             case "SLL":
-            case "SLR": {
+            case "SRL": {
                 if (this.processor.execRs.isFull() ||
                     this.processor.rob.isFull()) {
                     // Stall the pipeline, no rs available
@@ -2208,7 +2208,7 @@ function ExecutionLog() {
     this.ORI   = 0;
     this.XOR   = 0;
     this.SLL   = 0;
-    this.SLR   = 0;
+    this.SRL   = 0;
     this.SLLV  = 0;
     this.SRLV  = 0;
     this.CMP   = 0;
@@ -2533,7 +2533,7 @@ OperationsDuration = {
     ORI   : 1,
     XOR   : 1,
     SLL   : 1,
-    SLR   : 1,
+    SRL   : 1,
     SLLV  : 1,
     SRLV  : 1,
     CMP   : 1,

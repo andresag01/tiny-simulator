@@ -13,7 +13,7 @@ var instrMap    = {
     ORI:   [XRegExp("^(?<mnemonic>ORI)[ \t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+#(?<u>[0-9]+)$"), instrChecker0],
     XOR:   [XRegExp("^(?<mnemonic>XOR)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+\\$(?<t>[0-9]+)$"), instrChecker0],
     SLL:   [XRegExp("^(?<mnemonic>SLL)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+#(?<u>[0-9]+)$"), instrChecker0],
-    SLR:   [XRegExp("^(?<mnemonic>SLR)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+#(?<u>[0-9]+)$"), instrChecker0],
+    SRL:   [XRegExp("^(?<mnemonic>SRL)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+#(?<u>[0-9]+)$"), instrChecker0],
     SLLV:  [XRegExp("^(?<mnemonic>SLLV)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+\\$(?<t>[0-9]+)$"), instrChecker0],
     SRLV:  [XRegExp("^(?<mnemonic>SRLV)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+\\$(?<t>[0-9]+)$"), instrChecker0],
     CMP:   [XRegExp("^(?<mnemonic>CMP)[ \\t]+\\$(?<d>[0-9]+)[ \\t]+\\$(?<s>[0-9]+)[ \\t]+\\$(?<t>[0-9]+)$"), instrChecker0],
@@ -46,7 +46,7 @@ function instrChecker2(lineNo,
                        instructions,
                        labels,
                        unseenLabels,
-                       error) {
+                       errors) {
     // Checker for CT instruction
     var outInstr = {
         operation: match.mnemonic,
@@ -75,8 +75,12 @@ function instrChecker2(lineNo,
     instructions.push(outInstr);
 };
 
-function instrChecker1(lineNo, match, instructions, labels,
-    unseenLabels, error) {
+function instrChecker1(lineNo,
+                       match,
+                       instructions,
+                       labels,
+                       unseenLabels,
+                       errors) {
     // Checker for BBO, J and LC instructions
     var outInstr = {
         operation: match.mnemonic,

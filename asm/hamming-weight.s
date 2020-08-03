@@ -6,7 +6,7 @@
 for:
     ANDI $4 $0 #1
     ADD $1 $1 $4
-    SLR $0 $0 #1
+    SRL $0 $0 #1
     CMPLT $3 $2 $0 ; Branch if the value we are computing from isnt 0
     BBO $3 for
     LC $0 store
@@ -15,4 +15,4 @@ for:
 store:
     CT #0
 value:
-    CT #2147483647
+    CT #12345

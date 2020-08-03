@@ -16,7 +16,6 @@ function AsyncSimulationTask(totCycles, overlayId, simulator, spinner) {
             (i < AsyncSimulationTask.CYCLES_PER_CALLBACK) && !isHalted &&
             (self.remainingCycles == null || self.remainingCycles > 0);
             i++) {
-            console.log("Running 1 cycle");
             // Execute 1 cycle here
             self.processor.next();
             isHalted = self.processor.isHalted();
