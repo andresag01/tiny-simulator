@@ -543,26 +543,8 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
             },
             {
                 data: {
-                    source: 'commitUnit',
-                    target: 'branchReservationStation',
-                },
-            },
-            {
-                data: {
                     source: 'branchReservationStation',
                     target: 'commitUnit',
-                },
-            },
-            {
-                data: {
-                    source: 'commitUnit',
-                    target: 'renameTable',
-                },
-            },
-            {
-                data: {
-                    source: 'commitUnit',
-                    target: 'registerFile',
                 },
             },
         ],
