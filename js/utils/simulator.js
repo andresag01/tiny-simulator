@@ -158,6 +158,8 @@ Simulator.prototype.drawProcessorBlockDiagram = function(container) {
         autounselectify: true,
         zoomingEnabled: true,
         panningEnabled: true,
+        userZoomingEnabled: false,
+        userPanningEnabled:false,
 
         // list of graph elements to start with
         elements: [
